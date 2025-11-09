@@ -7,8 +7,17 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { getUser, User } from '@/lib/auth';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      retryDelay: 1000,
+      staleTime: 5000,
+    },
+  },
+});
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -47,9 +56,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, segments, isLoading]);
 
-  // Listen for auth state changes
+  // Listen for auth state changes (check less frequently to avoid crashes)
   useEffect(() => {
-    const interval = setInterval(checkAuth, 1000);
+    const interval = setInterval(checkAuth, 5000); // Changed from 1000ms to 5000ms
     return () => clearInterval(interval);
   }, []);
 
@@ -64,21 +73,23 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AuthProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen name="register" options={{ title: 'Register Family' }} />
-            <Stack.Screen name="search" options={{ title: 'Search Family' }} />
-            <Stack.Screen name="profile/[id]" options={{ title: 'Profile' }} />
-            <Stack.Screen name="rituals" options={{ title: 'Rituals' }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          </Stack>
-          <StatusBar style="auto" />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <AuthProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="register" options={{ title: 'Register Family' }} />
+              <Stack.Screen name="search" options={{ title: 'Search Family' }} />
+              <Stack.Screen name="profile/[id]" options={{ title: 'Profile' }} />
+              <Stack.Screen name="rituals" options={{ title: 'Rituals' }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            </Stack>
+            <StatusBar style="auto" />
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
