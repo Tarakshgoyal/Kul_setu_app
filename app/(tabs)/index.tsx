@@ -13,6 +13,7 @@ import FamilyFeed from '@/components/FamilyFeed';
 import ChatDrawer from '@/components/ChatDrawer';
 import ChatScreen from '@/components/ChatScreen';
 import StoryViewer from '@/components/StoryViewer';
+import UserProfile from '@/components/UserProfile';
 import { logout, getUser } from '@/lib/auth';
 import { apiService } from '@/lib/api';
 
@@ -62,6 +63,7 @@ export default function HomeScreen() {
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
   const [showCreateStory, setShowCreateStory] = useState(false);
   const [uploadingStory, setUploadingStory] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     loadUserAndStories();
@@ -335,6 +337,12 @@ export default function HomeScreen() {
           <Text style={styles.appTitle}>kul setu</Text>
 
           <View style={styles.headerRight}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => setShowProfile(true)}
+            >
+              <Ionicons name="person-circle-outline" size={24} color={colors.primary} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton}>
               <Ionicons name="notifications-outline" size={24} color={colors.primary} />
             </TouchableOpacity>
@@ -494,6 +502,9 @@ export default function HomeScreen() {
           </View>
         </View>
       )}
+
+      {/* User Profile Modal */}
+      <UserProfile visible={showProfile} onClose={() => setShowProfile(false)} />
     </>
   );
 }

@@ -145,6 +145,12 @@ export default function FamilyTreePage() {
   const loadFamilyMembers = async () => {
     setLoading(true);
     try {
+      // Get logged-in user's family line ID
+      const user = await getUser();
+      const userFamilyLineId = user?.familyLineId || user?.familyId || '';
+      
+      console.log('Tree - User familyLineId:', userFamilyLineId);
+
       const response = await fetch(`${API_BASE}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,18 +158,31 @@ export default function FamilyTreePage() {
       });
 
       if (response.ok) {
-        const members: FamilyMember[] = await response.json();
-        setFamilyMembers(members);
-        buildTreeData(members);
+        const allMembers: FamilyMember[] = await response.json();
+        
+        console.log('Tree - Total members fetched:', allMembers.length);
+        console.log('Tree - Sample member familyLineId:', allMembers[0]?.familyLineId);
+
+        // Filter members by family line ID - only show members from user's family
+        // Check both familyLineId and familyId fields
+        const familyMembers = userFamilyLineId
+          ? allMembers.filter(member => 
+              member.familyLineId === userFamilyLineId || 
+              (member as any).familyId === userFamilyLineId
+            )
+          : allMembers;
+        
+        console.log('Tree - Filtered members:', familyMembers.length);
+
+        setFamilyMembers(familyMembers);
+        buildTreeData(familyMembers);
       }
     } catch (error) {
       console.error('Error loading family members:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const buildTreeData = (members: FamilyMember[]) => {
+  };  const buildTreeData = (members: FamilyMember[]) => {
     // Group by generation
     const genMap = new Map<number, FamilyMember[]>();
 

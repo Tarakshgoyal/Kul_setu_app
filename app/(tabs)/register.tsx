@@ -17,6 +17,7 @@ export default function RegisterScreen() {
   const [formData, setFormData] = useState({
     // Basic Info
     firstName: '',
+    email: '',
     gender: 'M',
     generation: '1',
     ethnicity: '',
@@ -169,6 +170,7 @@ export default function RegisterScreen() {
         generation: parseInt(formData.generation) || 1,
         familyLineId: finalFamilyLineId,
       };
+      if (formData.email) memberData.email = formData.email;
 
       // Add optional fields only if they have values
       if (formData.ethnicity) memberData.ethnicity = formData.ethnicity;
@@ -232,6 +234,7 @@ export default function RegisterScreen() {
         // Reset form
         setFormData({
           firstName: '', gender: 'M', generation: '1', ethnicity: '', bloodGroup: '',
+          email: '',
           dob: '', dod: '', causeOfDeath: '', isAlive: true, 
           motherId: '', motherEmail: '', fatherId: '', fatherEmail: '',
           spouseId: '', spouseEmail: '', familyLineId: userFamilyLineId, sharedAncestryKey: '', 
@@ -272,6 +275,20 @@ export default function RegisterScreen() {
           value={formData.firstName}
           onChangeText={(value) => handleInputChange('firstName', value)}
           placeholder="Enter full name"
+          placeholderTextColor="#999"
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Email *</Text>
+        <TextInput
+          style={styles.input}
+          value={formData.email}
+          onChangeText={(value) => handleInputChange('email', value)}
+          placeholder="Enter email address"
+          placeholderTextColor="#999"
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
       </View>
       
@@ -300,6 +317,7 @@ export default function RegisterScreen() {
           value={formData.generation}
           onChangeText={(value) => handleInputChange('generation', value)}
           placeholder="Enter generation number"
+          placeholderTextColor="#999"
           keyboardType="numeric"
         />
       </View>
@@ -311,6 +329,7 @@ export default function RegisterScreen() {
           value={formData.ethnicity}
           onChangeText={(value) => handleInputChange('ethnicity', value)}
           placeholder="Enter ethnicity"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -351,6 +370,7 @@ export default function RegisterScreen() {
             value={formData.dob}
             onChangeText={(value) => handleInputChange('dob', value)}
             placeholder="YYYY-MM-DD"
+            placeholderTextColor="#999"
           />
         </View>
       ) : (
@@ -362,6 +382,7 @@ export default function RegisterScreen() {
               value={formData.dod}
               onChangeText={(value) => handleInputChange('dod', value)}
               placeholder="YYYY-MM-DD"
+              placeholderTextColor="#999"
             />
           </View>
           <View style={styles.inputGroup}>
@@ -371,6 +392,7 @@ export default function RegisterScreen() {
               value={formData.causeOfDeath}
               onChangeText={(value) => handleInputChange('causeOfDeath', value)}
               placeholder="Enter cause of death"
+              placeholderTextColor="#999"
             />
           </View>
         </>
@@ -387,6 +409,7 @@ export default function RegisterScreen() {
           value={formData.motherEmail}
           onChangeText={(value) => handleInputChange('motherEmail', value)}
           placeholder="Enter mother's email"
+          placeholderTextColor="#999"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -399,6 +422,7 @@ export default function RegisterScreen() {
           value={formData.fatherEmail}
           onChangeText={(value) => handleInputChange('fatherEmail', value)}
           placeholder="Enter father's email"
+          placeholderTextColor="#999"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -411,6 +435,7 @@ export default function RegisterScreen() {
           value={formData.spouseEmail}
           onChangeText={(value) => handleInputChange('spouseEmail', value)}
           placeholder="Enter spouse's email"
+          placeholderTextColor="#999"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -423,6 +448,7 @@ export default function RegisterScreen() {
           value={formData.familyLineId}
           onChangeText={(value) => handleInputChange('familyLineId', value)}
           placeholder={userFamilyLineId ? userFamilyLineId : "Will use your family line ID"}
+          placeholderTextColor="#999"
           editable={!userFamilyLineId}
         />
         {userFamilyLineId && (
@@ -439,6 +465,7 @@ export default function RegisterScreen() {
           value={formData.sharedAncestryKey}
           onChangeText={(value) => handleInputChange('sharedAncestryKey', value)}
           placeholder="Enter ancestry key"
+          placeholderTextColor="#999"
         />
       </View>
     </View>
@@ -470,6 +497,7 @@ export default function RegisterScreen() {
           value={formData.eyeColor}
           onChangeText={(value) => handleInputChange('eyeColor', value)}
           placeholder="e.g., Brown, Blue, Green"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -480,6 +508,7 @@ export default function RegisterScreen() {
           value={formData.hairColor}
           onChangeText={(value) => handleInputChange('hairColor', value)}
           placeholder="e.g., Black, Brown, Blonde"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -490,6 +519,7 @@ export default function RegisterScreen() {
           value={formData.skinTone}
           onChangeText={(value) => handleInputChange('skinTone', value)}
           placeholder="e.g., Fair, Medium, Dark"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -500,6 +530,7 @@ export default function RegisterScreen() {
           value={formData.birthmark}
           onChangeText={(value) => handleInputChange('birthmark', value)}
           placeholder="Describe any birthmarks"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -526,6 +557,7 @@ export default function RegisterScreen() {
           value={formData.beardStyle}
           onChangeText={(value) => handleInputChange('beardStyle', value)}
           placeholder="Describe beard style"
+          placeholderTextColor="#999"
         />
       </View>
     </View>
@@ -588,6 +620,7 @@ export default function RegisterScreen() {
           value={formData.otherDisease}
           onChangeText={(value) => handleInputChange('otherDisease', value)}
           placeholder="List any other diseases"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -598,6 +631,7 @@ export default function RegisterScreen() {
           value={formData.disability}
           onChangeText={(value) => handleInputChange('disability', value)}
           placeholder="Describe any disabilities"
+          placeholderTextColor="#999"
         />
       </View>
     </View>
@@ -612,6 +646,7 @@ export default function RegisterScreen() {
           value={formData.natureOfPerson}
           onChangeText={(value) => handleInputChange('natureOfPerson', value)}
           placeholder="e.g., Kind, Generous, Wise"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -622,6 +657,7 @@ export default function RegisterScreen() {
           value={formData.favNatureOfPerson}
           onChangeText={(value) => handleInputChange('favNatureOfPerson', value)}
           placeholder="Their favorite personality traits"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -632,6 +668,7 @@ export default function RegisterScreen() {
           value={formData.familyTraditions}
           onChangeText={(value) => handleInputChange('familyTraditions', value)}
           placeholder="Describe family traditions they followed"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -642,6 +679,7 @@ export default function RegisterScreen() {
           value={formData.passion}
           onChangeText={(value) => handleInputChange('passion', value)}
           placeholder="Their hobbies and interests"
+          placeholderTextColor="#999"
         />
       </View>
     </View>
@@ -656,6 +694,7 @@ export default function RegisterScreen() {
           value={formData.nativeLocation}
           onChangeText={(value) => handleInputChange('nativeLocation', value)}
           placeholder="Their place of birth/origin"
+          placeholderTextColor="#999"
         />
       </View>
       
@@ -666,6 +705,7 @@ export default function RegisterScreen() {
           value={formData.migrationPath}
           onChangeText={(value) => handleInputChange('migrationPath', value)}
           placeholder="Places they lived/moved to"
+          placeholderTextColor="#999"
         />
       </View>
     </View>
