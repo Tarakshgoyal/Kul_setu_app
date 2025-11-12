@@ -74,14 +74,16 @@ export default function HomeScreen() {
       const currentUser = await getUser();
       setUser(currentUser);
 
-      if (!currentUser?.familyLineId) {
+      // Check both familyLineId and familyId for backward compatibility
+      const familyId = currentUser?.familyLineId || currentUser?.familyId;
+      if (!familyId) {
         console.log('No family line ID found');
         setLoadingStories(false);
         return;
       }
 
       // Fetch real stories from backend
-      const storiesResponse = await apiService.getStories(currentUser.familyLineId);
+      const storiesResponse = await apiService.getStories(familyId);
       
       if (storiesResponse.success && storiesResponse.stories) {
         // Map backend stories to UI format
