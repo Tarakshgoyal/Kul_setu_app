@@ -74,11 +74,23 @@ export default function RegisterScreen() {
   // Load user's family line ID on component mount
   useEffect(() => {
     const loadUserFamilyId = async () => {
+      console.log('=== LOADING USER FAMILY ID ===');
       const loggedInUser = await getUser();
-      if (loggedInUser?.familyLineId) {
-        setUserFamilyLineId(loggedInUser.familyLineId);
+      console.log('Logged in user:', JSON.stringify(loggedInUser, null, 2));
+      // Check both familyLineId and familyId (for backward compatibility)
+      const familyId = loggedInUser?.familyLineId || loggedInUser?.familyId;
+      console.log('User familyLineId/familyId:', familyId);
+      if (familyId) {
+        console.log('Setting userFamilyLineId to:', familyId);
+        setUserFamilyLineId(familyId);
         // Pre-fill family line ID in form
-        setFormData(prev => ({ ...prev, familyLineId: loggedInUser.familyLineId || '' }));
+        setFormData(prev => {
+          const updated = { ...prev, familyLineId: familyId };
+          console.log('Updated formData.familyLineId:', updated.familyLineId);
+          return updated;
+        });
+      } else {
+        console.log('No familyLineId or familyId found in user data');
       }
     };
     loadUserFamilyId();
@@ -450,6 +462,7 @@ export default function RegisterScreen() {
           placeholder={userFamilyLineId ? userFamilyLineId : "Will use your family line ID"}
           placeholderTextColor="#999"
           editable={!userFamilyLineId}
+          onLayout={() => console.log('Family Line ID field - value:', formData.familyLineId, 'userFamilyLineId:', userFamilyLineId)}
         />
         {userFamilyLineId && (
           <Text style={styles.helpText}>
