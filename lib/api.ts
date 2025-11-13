@@ -13,6 +13,7 @@ export interface FamilyMember {
   generation: number;
   firstName: string;
   gender: string;
+  email?: string;
   ethnicity?: string;
   motherId?: string;
   fatherId?: string;

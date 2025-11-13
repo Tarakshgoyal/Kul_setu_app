@@ -27,6 +27,7 @@ type Member = {
   spouse?: {
     name: string;
     status: 'married' | 'divorced';
+    fullData?: FamilyMember;
   };
   exSpouses?: {
     name: string;
@@ -40,7 +41,11 @@ type Generation = {
   members: Member[];
 };
 
-const MemberCard = ({ member, onPress }: { member: Member; onPress: () => void }) => {
+const MemberCard = ({ member, onPress, onSpousePress }: { 
+  member: Member; 
+  onPress: () => void;
+  onSpousePress?: () => void;
+}) => {
   return (
     <TouchableOpacity style={styles.memberCardWrapper} onPress={onPress}>
       <View style={styles.memberCard}>
@@ -93,7 +98,10 @@ const MemberCard = ({ member, onPress }: { member: Member; onPress: () => void }
             </View>
           </View>
 
-          <View style={styles.spouseCard}>
+          <TouchableOpacity 
+            style={styles.spouseCard}
+            onPress={onSpousePress || onPress}
+          >
             <View style={styles.spouseAvatarContainer}>
               <View
                 style={[
@@ -112,7 +120,7 @@ const MemberCard = ({ member, onPress }: { member: Member; onPress: () => void }
             <Text style={styles.spouseName} numberOfLines={1}>
               {member.spouse.name}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -202,6 +210,7 @@ const PersonDetailsModal = ({
             <View style={styles.detailSection}>
               <Text style={styles.sectionTitle}>Basic Information</Text>
               <InfoRow icon="person-outline" label="Gender" value={person.gender} />
+              <InfoRow icon="mail-outline" label="Email" value={person.email} />
               <InfoRow icon="calendar-outline" label="Date of Birth" value={formatDate(person.dob)} />
               {!isAlive && (
                 <>
@@ -392,6 +401,7 @@ export default function FamilyTreePage() {
           ? {
               name: spouse.firstName || 'Unknown',
               status: 'married' as 'married' | 'divorced',
+              fullData: spouse,
             }
           : undefined;
 
@@ -518,6 +528,10 @@ export default function FamilyTreePage() {
                             setSelectedPerson(member.fullData);
                             setShowModal(true);
                           }}
+                          onSpousePress={member.spouse?.fullData ? () => {
+                            setSelectedPerson(member.spouse!.fullData!);
+                            setShowModal(true);
+                          } : undefined}
                         />
 
                         {/* Connection Line to Next Generation */}
