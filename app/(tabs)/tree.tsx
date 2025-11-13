@@ -210,6 +210,12 @@ export default function FamilyTreePage() {
           ? members.find((m) => m.personId === member.spouseId)
           : undefined;
 
+        // If spouse exists and is male while current member is female, skip this member
+        // The male partner will be processed and will display above
+        if (spouse && member.gender === 'F' && (spouse.gender === 'M' || spouse.gender === 'Male')) {
+          return; // Skip, will be processed when male partner is encountered
+        }
+
         if (spouse) {
           processedIds.add(spouse.personId);
         }
