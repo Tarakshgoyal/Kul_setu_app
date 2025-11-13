@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,6 +32,7 @@ type Member = {
     name: string;
     status: 'divorced';
   }[];
+  fullData: FamilyMember;
 };
 
 type Generation = {
@@ -38,9 +40,9 @@ type Generation = {
   members: Member[];
 };
 
-const MemberCard = ({ member }: { member: Member }) => {
+const MemberCard = ({ member, onPress }: { member: Member; onPress: () => void }) => {
   return (
-    <View style={styles.memberCardWrapper}>
+    <TouchableOpacity style={styles.memberCardWrapper} onPress={onPress}>
       <View style={styles.memberCard}>
         {/* Avatar */}
         <View style={styles.avatarContainer}>
@@ -128,7 +130,163 @@ const MemberCard = ({ member }: { member: Member }) => {
           ))}
         </View>
       )}
-    </View>
+    </TouchableOpacity>
+  );
+};
+
+const PersonDetailsModal = ({ 
+  visible, 
+  person, 
+  onClose 
+}: { 
+  visible: boolean; 
+  person: FamilyMember | null; 
+  onClose: () => void;
+}) => {
+  if (!person) return null;
+
+  const formatDate = (date?: string) => {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString();
+  };
+
+  const InfoRow = ({ icon, label, value }: { icon: string; label: string; value?: string }) => {
+    if (!value) return null;
+    return (
+      <View style={styles.infoRow}>
+        <Ionicons name={icon as any} size={18} color="#FF9500" style={styles.infoIcon} />
+        <View style={styles.infoContent}>
+          <Text style={styles.infoLabel}>{label}</Text>
+          <Text style={styles.infoValue}>{value}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  const fullName = person.firstName || 'Unknown';
+  const isAlive = !person.dod;
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          {/* Header */}
+          <View style={styles.modalHeader}>
+            <View style={styles.modalAvatarContainer}>
+              <View
+                style={[
+                  styles.modalAvatar,
+                  { backgroundColor: person.gender === 'M' || person.gender === 'Male' ? '#3B82F6' : '#EC4899' },
+                ]}
+              >
+                <Text style={styles.modalAvatarText}>{person.firstName?.charAt(0) || '?'}</Text>
+              </View>
+            </View>
+            <Text style={styles.modalName}>{fullName}</Text>
+            <Text style={styles.modalStatus}>
+              {isAlive ? '✓ Alive' : '† Deceased'}
+            </Text>
+            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Details */}
+          <ScrollView style={styles.modalBody}>
+            {/* Basic Information */}
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>Basic Information</Text>
+              <InfoRow icon="person-outline" label="Gender" value={person.gender} />
+              <InfoRow icon="calendar-outline" label="Date of Birth" value={formatDate(person.dob)} />
+              {!isAlive && (
+                <>
+                  <InfoRow icon="calendar-outline" label="Date of Death" value={formatDate(person.dod)} />
+                  <InfoRow icon="alert-circle-outline" label="Cause of Death" value={person.causeOfDeath} />
+                </>
+              )}
+              <InfoRow icon="people-outline" label="Ethnicity" value={person.ethnicity} />
+            </View>
+
+            {/* Physical Traits */}
+            {(person.eyeColor || person.hairColor || person.skinTone || person.bloodGroup) && (
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Physical Traits</Text>
+                <InfoRow icon="eye-outline" label="Eye Color" value={person.eyeColor} />
+                <InfoRow icon="cut-outline" label="Hair Color" value={person.hairColor} />
+                <InfoRow icon="color-palette-outline" label="Skin Tone" value={person.skinTone} />
+                <InfoRow icon="water-outline" label="Blood Group" value={person.bloodGroup} />
+                <InfoRow icon="fitness-outline" label="Birthmark" value={person.birthmark} />
+                <InfoRow icon="ellipse-outline" label="Freckles" value={person.freckles} />
+              </View>
+            )}
+
+            {/* Location */}
+            {(person.nativeLocation || person.migrationPath) && (
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Location</Text>
+                <InfoRow icon="location-outline" label="Native Location" value={person.nativeLocation} />
+                <InfoRow icon="navigate-outline" label="Migration Path" value={person.migrationPath} />
+              </View>
+            )}
+
+            {/* Education & Status */}
+            {(person.educationLevel || person.socioeconomicStatus) && (
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Education & Status</Text>
+                <InfoRow icon="school-outline" label="Education" value={person.educationLevel} />
+                <InfoRow icon="trending-up-outline" label="Socioeconomic Status" value={person.socioeconomicStatus} />
+              </View>
+            )}
+
+            {/* Health */}
+            {(person.conditionDiabetes || person.conditionHeartIssue || person.conditionAsthma || person.disability || person.otherDisease) && (
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Health Information</Text>
+                <InfoRow icon="medical-outline" label="Diabetes" value={person.conditionDiabetes} />
+                <InfoRow icon="heart-outline" label="Heart Issue" value={person.conditionHeartIssue} />
+                <InfoRow icon="fitness-outline" label="Asthma" value={person.conditionAsthma} />
+                <InfoRow icon="eye-outline" label="Color Blindness" value={person.conditionColorBlindness} />
+                <InfoRow icon="accessibility-outline" label="Disability" value={person.disability} />
+                <InfoRow icon="medkit-outline" label="Other Disease" value={person.otherDisease} />
+              </View>
+            )}
+
+            {/* Personal Traits */}
+            {(person.natureOfPerson || person.passion || person.leftHanded || person.isTwin) && (
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Personal Traits</Text>
+                <InfoRow icon="happy-outline" label="Nature" value={person.natureOfPerson} />
+                <InfoRow icon="flame-outline" label="Passion" value={person.passion} />
+                <InfoRow icon="hand-left-outline" label="Left Handed" value={person.leftHanded} />
+                <InfoRow icon="people-outline" label="Twin" value={person.isTwin} />
+              </View>
+            )}
+
+            {/* Cultural */}
+            {(person.familyTraditions || person.recipesCuisine) && (
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Cultural</Text>
+                <InfoRow icon="book-outline" label="Family Traditions" value={person.familyTraditions} />
+                <InfoRow icon="restaurant-outline" label="Recipes & Cuisine" value={person.recipesCuisine} />
+              </View>
+            )}
+
+            {/* System Info */}
+            <View style={styles.detailSection}>
+              <Text style={styles.sectionTitle}>System Information</Text>
+              <InfoRow icon="id-card-outline" label="Person ID" value={person.personId} />
+              <InfoRow icon="git-branch-outline" label="Family Line ID" value={person.familyLineId} />
+              <InfoRow icon="layers-outline" label="Generation" value={String(person.generation)} />
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
   );
 };
 
@@ -136,6 +294,8 @@ export default function FamilyTreePage() {
   const [zoom, setZoom] = useState(100);
   const [loading, setLoading] = useState(true);
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+  const [selectedPerson, setSelectedPerson] = useState<FamilyMember | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [treeData, setTreeData] = useState<{ generations: Generation[] }>({ generations: [] });
 
   useEffect(() => {
@@ -241,6 +401,7 @@ export default function FamilyTreePage() {
           gender: member.gender === 'M' || member.gender === 'Male' ? 'male' : 'female',
           age: getAge(member.dob, member.dod),
           spouse: spouseInfo,
+          fullData: member,
         });
 
         processedIds.add(member.personId);
@@ -351,7 +512,13 @@ export default function FamilyTreePage() {
                   <View style={styles.membersRow}>
                     {generation.members.map((member) => (
                       <View key={member.id} style={styles.memberContainer}>
-                        <MemberCard member={member} />
+                        <MemberCard 
+                          member={member} 
+                          onPress={() => {
+                            setSelectedPerson(member.fullData);
+                            setShowModal(true);
+                          }}
+                        />
 
                         {/* Connection Line to Next Generation */}
                         {genIndex < treeData.generations.length - 1 && (
@@ -397,6 +564,16 @@ export default function FamilyTreePage() {
           </View>
         )}
       </ScrollView>
+
+      {/* Person Details Modal */}
+      <PersonDetailsModal
+        visible={showModal}
+        person={selectedPerson}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedPerson(null);
+        }}
+      />
     </View>
   );
 }
@@ -728,4 +905,101 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
   },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    paddingTop: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    position: 'relative',
+  },
+  modalAvatarContainer: {
+    marginBottom: 12,
+  },
+  modalAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalAvatarText: {
+    color: 'white',
+    fontSize: 32,
+    fontWeight: '700',
+  },
+  modalName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  modalStatus: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalBody: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  detailSection: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF9500',
+    marginBottom: 12,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  infoIcon: {
+    marginTop: 2,
+    marginRight: 12,
+  },
+  infoLabel: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  infoValue: {
+    fontSize: 15,
+    color: '#1F2937',
+    fontWeight: '500',
+  },
 });
+
