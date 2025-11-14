@@ -32,7 +32,6 @@ export default function TabLayout() {
         options={{
           title: 'Register',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.badge.plus" color={color} />,
-          href: null,
         }}
       />
       <Tabs.Screen
